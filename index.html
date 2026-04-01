@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WOLF LABS | The Hotel Tour HW</title>
+    <!-- Premium UI Fonts: Montserrat for bold Headers, Outfit for sleek modern body text -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- WOLF LABS SUPREME ENGINE V9.5 (HW EDITION - EMERALD GREEN) --- */
+        :root {
+            --bg-base: #030704; 
+            --brand-red: #E22134; 
+            --accent: #1DB954; /* Spotify Emerald Green */
+            --accent-glow: rgba(29, 185, 84, 0.4);
+            --correct: #1DB954;
+            --incorrect: #E22134;
+            --text-main: #FFFFFF;
+            --text-dim: #9ca3af;
+            --glass-bg: rgba(6, 12, 8, 0.85);
+            --glass-border: rgba(29, 185, 84, 0.25); 
+            --font-display: 'Montserrat', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.08) 0%, transparent 70%),
+                              url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-blend-mode: overlay;
+            color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        /* --- UI OVERLAY --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 80px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: rgba(3, 7, 4, 0.85); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .logo { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; letter-spacing: 2px; display: flex; align-items: center; gap: 10px;}
+        .logo span { color: #000; font-family: var(--font-body); font-weight: 800; font-size: 0.8rem; padding: 4px 10px; border-radius: 6px; background: var(--accent); letter-spacing: 1px; }
+        .progress-container { position: absolute; bottom: -1px; left: 0; right: 0; height: 5px; background: rgba(255,255,255,0.05); }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* --- NAVIGATION BAR --- */
+        .nav-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; height: 90px; padding: 0 40px; 
+            background: rgba(3, 7, 4, 0.95); border-top: 1px solid var(--glass-border); 
+            display: flex; align-items: center; justify-content: space-between; 
+            z-index: 100; backdrop-filter: blur(25px); box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+        }
+        .nav-btn { 
+            padding: 14px 30px; border-radius: 500px; font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; 
+            text-transform: uppercase; cursor: pointer; transition: all 0.3s; 
+            display: flex; align-items: center; gap: 10px; font-family: var(--font-body);
+            background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.2);
+            outline: none; -webkit-appearance: none;
+        }
+        .nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: #fff;}
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: transparent; }
+        .nav-btn-accent { background: #fff; color: #000; border: none; box-shadow: 0 5px 20px rgba(255,255,255,0.2); }
+        .nav-btn-accent:hover:not(:disabled) { background: var(--accent); color: #000; transform: translateY(-3px); box-shadow: 0 10px 30px var(--accent-glow); }
+
+        /* --- CARD SYSTEM --- */
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 20px; position: relative; z-index: 10; }
+        
+        .card-stack { position: relative; width: 100%; max-width: 650px; height: 650px; perspective: 1000px; }
+
+        .card {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border); border-top: 1px solid rgba(29, 185, 84, 0.4); border-radius: 24px; padding: 50px;
+            display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(29, 185, 84, 0.05);
+            opacity: 0; transform: scale(0.9) translateY(40px); pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            visibility: hidden;
+            overflow-y: auto; scrollbar-width: none;
+        }
+        .card::-webkit-scrollbar { display: none; }
+
+        .card.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; visibility: visible; z-index: 10; }
+        .card.exit-left { opacity: 0; transform: translateX(-100px) scale(0.95); pointer-events: none; visibility: visible; }
+        .card.exit-right { opacity: 0; transform: translateX(100px) scale(0.95); pointer-events: none; visibility: visible; }
+
+        /* --- CONTENT ELEMENTS --- */
+        .q-icon-box { 
+            width: 110px; height: 110px; border-radius: 24px; flex-shrink: 0;
+            background: rgba(29, 185, 84, 0.08); border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px; color: var(--accent); font-size: 3rem;
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+        
+        h1 { font-family: var(--font-display); font-size: 2.8rem; margin-bottom: 10px; line-height: 1.1; text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .badge { background: rgba(29, 185, 84, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 6px 18px; border-radius: 500px; font-weight: 800; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; font-family: var(--font-code);}
+        .q-text { font-size: 1.5rem; font-weight: 600; margin-bottom: 40px; color: #fff; line-height: 1.5; width: 100%; }
+        
+        /* --- BUTTONS (CENTERED DESIGN) --- */
+        .options-grid { width: 100%; display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
+        .opt-btn {
+            -webkit-appearance: none; appearance: none; outline: none;
+            width: 100%; padding: 18px 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.03); color: #fff; font-size: 1.25rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; 
+            display: flex; align-items: center; justify-content: center; text-align: center; /* CENTERED */
+            gap: 12px; font-family: var(--font-body);
+        }
+        .opt-btn:hover { background: rgba(29, 185, 84, 0.1); border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.4);}
+        .opt-btn.correct { background: var(--correct) !important; color: #000; border-color: var(--correct); box-shadow: 0 5px 25px rgba(29, 185, 84, 0.4); font-weight: 800; }
+        .opt-btn.wrong { background: var(--incorrect) !important; color: #fff; border-color: var(--incorrect); animation: shake 0.4s; box-shadow: 0 5px 25px rgba(226, 33, 52, 0.4);}
+
+        /* --- INTERACTIVE READING TEXT --- */
+        .reading-box {
+            background: rgba(0,0,0,0.5); border: 1px dashed var(--accent); border-radius: 20px;
+            padding: 30px; text-align: left; font-size: 1.3rem; line-height: 1.8; margin-bottom: 25px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .click-word {
+            display: inline-block; padding: 2px 10px; border-radius: 8px; cursor: pointer;
+            transition: 0.3s; border: 1px dashed rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); font-weight: 700;
+        }
+        .click-word:hover { background: rgba(29, 185, 84, 0.2); border-color: var(--accent); }
+        .click-word.found { background: var(--correct); color: #000; font-weight: 800; border-color: var(--correct); box-shadow: 0 0 15px var(--accent-glow); pointer-events: none; border-style: solid;}
+        .click-word.wrong { background: var(--incorrect); color: #fff; border-color: var(--incorrect); animation: shake 0.4s; border-style: solid;}
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+
+        /* --- MOBILE --- */
+        @media (max-width: 480px) {
+            .card { padding: 30px 25px; }
+            h1 { font-size: 2.2rem; }
+            .q-icon-box { width: 90px; height: 90px; font-size: 2.5rem; margin-bottom: 15px;}
+            .card-stack { height: 600px; }
+            .q-text { font-size: 1.15rem; }
+            .nav-btn { padding: 12px 20px; font-size: 0.95rem; }
+            .opt-btn { font-size: 1.1rem; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo"><i class="fa-solid fa-bell-concierge" style="color: var(--accent); margin-right: 10px;"></i> WOLF LABS <span>HW</span></div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </header>
+
+    <main>
+        <div class="card-stack" id="deck">
+            
+            <!-- COVER (SCENE 0) -->
+            <div class="card active" id="card-0">
+                <div class="q-icon-box"><i class="fa-solid fa-hotel"></i></div>
+                <div class="badge">A2+ | THE HOTEL TOUR</div>
+                <h1>INTERACTIVE<br>HOMEWORK</h1>
+                <p style="margin-top: 15px; color: var(--text-dim); line-height: 1.6; font-size: 1.2rem;">10 Exercises. Master hotel amenities vocabulary and the Present Continuous tense in this practice mission.</p>
+            </div>
+
+            <!-- QUESTION 1 (VOCAB) -->
+            <div class="card" id="card-1">
+                <div class="badge">Q1 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-door-open"></i></div>
+                <div class="q-text">A door that turns around a central point is called a...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) transparent door</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) revolving door</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) sliding door</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 2 (GRAMMAR) -->
+            <div class="card" id="card-2">
+                <div class="badge">Q2 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-cart-flatbed-suitcase"></i></div>
+                <div class="q-text">"Look! The concierge ________ my bags on the luggage trolley right now."</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) put</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) is putting</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) are putting</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 3 (VOCAB) -->
+            <div class="card" id="card-3">
+                <div class="badge">Q3 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-wine-glass"></i></div>
+                <div class="q-text">A glass that you can see through completely is...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) opaque</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">B) complimentary</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">C) transparent</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 4 (VOCAB) -->
+            <div class="card" id="card-4">
+                <div class="badge">Q4 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-gift"></i></div>
+                <div class="q-text">If the hotel gives you a free bottle of water in the minibar, it is...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, true)">A) complimentary</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">B) nourishing</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) expensive</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 5 (GRAMMAR) -->
+            <div class="card" id="card-5">
+                <div class="badge">Q5 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-bowl-food"></i></div>
+                <div class="q-text">"I ________ the hot broth over the noodles for breakfast."</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) is pouring</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) am pouring</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) pouring</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 6 (VOCAB) -->
+            <div class="card" id="card-6">
+                <div class="badge">Q6 / 10</div>
+                <div class="q-icon-box"><i class="fa-solid fa-bed"></i></div>
+                <div class="q-text">The thick, warm blanket on the hotel bed is called a...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) tray</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) duvet</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) lounge</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 7 (INTERACTIVE READING) -->
+            <div class="card" id="card-7">
+                <div class="badge">Q7 / 10 (INTERACTIVE)</div>
+                <div class="q-text" style="font-size: 1.2rem; margin-bottom: 20px;">Read the text and find the <strong>4 Hotel Vocabulary words</strong>. Click on them!</div>
+                <div class="reading-box">
+                    "My <span class="click-word" onclick="checkWord(this, false)">room</span> is amazing. The <span class="click-word" onclick="checkWord(this, true)">minibar</span> has <span class="click-word" onclick="checkWord(this, true)">complimentary</span> water. I can see the ocean through the <span class="click-word" onclick="checkWord(this, true)">transparent</span> glass door. I love resting under the warm <span class="click-word" onclick="checkWord(this, true)">duvet</span>."
+                </div>
+                <p id="reading-progress" style="color: var(--accent); font-weight: 800; font-size: 1.25rem; margin-top: auto;">Found: 0 / 4</p>
+            </div>
+
+            <!-- QUESTION 8 (COMPREHENSION) -->
+            <div class="card" id="card-8">
+                <div class="badge">Q8 / 10 (COMPREHENSION)</div>
+                <div class="q-icon-box"><i class="fa-solid fa-brain"></i></div>
+                <div class="q-text">Based on the text you just read, do you have to pay for the water?</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) Yes, it is very expensive.</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) No, it is free of charge.</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 9 (BUG HUNT) -->
+            <div class="card" id="card-9">
+                <div class="badge">Q9 / 10 (BUG HUNT)</div>
+                <div class="q-icon-box"><i class="fa-solid fa-bug"></i></div>
+                <div class="q-text">Choose the CORRECT grammar sentence:</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) He are walking down the corridor.</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) He is walking down the corridor.</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) He am walking down the corridor.</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 10 (CHAT) -->
+            <div class="card" id="card-10">
+                <div class="badge">Q10 / 10 (CHAT)</div>
+                <div class="q-icon-box"><i class="fa-solid fa-message"></i></div>
+                <div class="q-text">Concierge: "Do you need help with your luggage?"</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) No, I carrying them.</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">B) No, I am carry them.</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">C) No thanks, I am carrying them.</button>
+                </div>
+            </div>
+
+            <!-- FINAL SCENE -->
+            <div class="card" id="card-final">
+                <div class="q-icon-box" style="color: var(--correct); border-color: var(--correct); background: rgba(29, 185, 84, 0.08);"><i class="fa-solid fa-star"></i></div>
+                <h1>WELL DONE!</h1>
+                <p style="color: var(--text-dim); margin: 20px 0; font-size: 1.3rem;">Mission Accomplished.<br>Hotel Tour Vocabulary: 100%</p>
+                <button class="nav-btn nav-btn-accent" style="margin-top: auto; padding: 18px 50px; font-size: 1.1rem; border-radius: 500px;" onclick="location.reload()">TRY AGAIN</button>
+            </div>
+
+        </div>
+    </main>
+
+    <nav class="nav-bar">
+        <button class="nav-btn" id="prevBtn" onclick="prevCard()"><i class="fa-solid fa-arrow-left"></i> BACK</button>
+        <div id="counter" style="font-family: var(--font-code); color: var(--accent); font-weight: 800; font-size: 1.2rem; letter-spacing: 2px;">0/10</div>
+        <button class="nav-btn nav-btn-accent" id="nextBtn" onclick="nextCard()">START <i class="fa-solid fa-arrow-right"></i></button>
+    </nav>
+
+    <script>
+        let currentStep = 0;
+        const totalQuestions = 10;
+
+        function updateUI() {
+            // Setup cards visibility using CSS classes
+            document.querySelectorAll('.card').forEach((c, index) => {
+                if (index === currentStep) {
+                    c.className = 'card active';
+                } else if (index < currentStep) {
+                    c.className = 'card exit-left';
+                } else {
+                    c.className = 'card exit-right';
+                }
+            });
+
+            // Update counter
+            if(currentStep === 0) {
+                document.getElementById('counter').innerText = `INTRO`;
+            } else if(currentStep > 0 && currentStep <= totalQuestions) {
+                document.getElementById('counter').innerText = `${currentStep}/${totalQuestions}`;
+            } else if (currentStep > totalQuestions) {
+                document.getElementById('counter').innerText = `DONE`;
+            }
+
+            // Update Progress Bar
+            const progress = (currentStep / (totalQuestions + 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Button states
+            document.getElementById('prevBtn').disabled = (currentStep === 0);
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStep === 0) {
+                nextBtn.innerHTML = 'START <i class="fa-solid fa-arrow-right"></i>';
+                nextBtn.style.display = 'flex';
+            } else if (currentStep > totalQuestions) {
+                nextBtn.style.display = 'none'; // Hide on final screen
+            } else {
+                nextBtn.innerHTML = 'NEXT <i class="fa-solid fa-arrow-right"></i>';
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        function nextCard() {
+            if (currentStep <= totalQuestions) {
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function prevCard() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        }
+
+        function handleChoice(btn, isCorrect) {
+            const options = btn.parentElement.querySelectorAll('.opt-btn');
+            
+            if(isCorrect) {
+                btn.classList.add('correct');
+                if(!btn.innerHTML.includes('fa-check')) btn.innerHTML += ' <i class="fa-solid fa-check" style="margin-left:auto;"></i>';
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                // Auto advance
+                setTimeout(() => {
+                    nextCard();
+                }, 800);
+                
+            } else {
+                btn.classList.add('wrong');
+                if(!btn.innerHTML.includes('fa-xmark')) btn.innerHTML += ' <i class="fa-solid fa-xmark" style="margin-left:auto;"></i>';
+                btn.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    btn.classList.remove('wrong');
+                    btn.innerHTML = btn.innerHTML.replace(' <i class="fa-solid fa-xmark" style="margin-left:auto;"></i>', '');
+                    btn.style.pointerEvents = 'auto';
+                }, 800);
+            }
+        }
+
+        // Reading Interaction Logic
+        let wordsFound = 0;
+        function checkWord(el, isCorrectTarget) {
+            if (el.classList.contains('found') || el.classList.contains('wrong')) return;
+            
+            if (isCorrectTarget) {
+                el.classList.add('found');
+                wordsFound++;
+                document.getElementById('reading-progress').innerText = `Found: ${wordsFound} / 4`;
+                if(wordsFound === 4) {
+                    document.getElementById('reading-progress').innerHTML = `All words found! 🎉 <br><span style="font-size: 1rem; font-weight: normal; color: #d1d5db; margin-top: 5px; display: block;">Click NEXT to continue.</span>`;
+                }
+            } else {
+                el.classList.add('wrong');
+                setTimeout(() => el.classList.remove('wrong'), 600);
+            }
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
